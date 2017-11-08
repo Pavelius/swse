@@ -152,5 +152,8 @@
     <ClCompile Include="specie.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="ability.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

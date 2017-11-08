@@ -29,7 +29,13 @@ enum talent_s : char {
 	JediConsular, JediGuardian, JediSentinel, LightsaberCombat,
 	Influence, Inspiration, Leadership, Lineage,
 };
-
+enum skill_s : char {
+	Acrobatic, Climb, Deception, Endurance, GatherInformation,
+	Initiative, Jump, Buerocracy, GalacticLore, LifeSciences,
+	PhysicalSciences, SocialSciences, Tactics, Technology, Mechanics,
+	Perception, Persuasion, Pilot, Ride, Stealth,
+	Survival, Swim, TreatInjury, UseComputer, UseForce
+};
 enum feat_s : unsigned short {
 	// Jedi
 	AdeptNegotiator, ForcePersuasion, MasterNegotiator, SkilledAdvisor,
@@ -53,7 +59,13 @@ enum feat_s : unsigned short {
 	Mobility, Pin, PointBlankShoot, PowerAttack, PowerfulCharge,
 	PreciseShoot, QuickDraw, RapidShoot, RapidStrike, RunningAttack,
 	ShakeItOff,
-	Sniper, StrongInTheForce,
+	Sniper,
+	SkillFocusAcrobatic, SkillFocusClimb, SkillFocusDeception, SkillFocusEndurance, SkillFocusGatherInformation,
+	SkillFocusInitiative, SkillFocusJump, SkillFocusBuerocracy, SkillFocusGalacticLore, SkillFocusLifeSciences,
+	SkillFocusPhysicalSciences, SkillFocusSocialSciences, SkillFocusTactics, SkillFocusTechnology, SkillFocusMechanics,
+	SkillFocusPerception, SkillFocusPersuasion, SkillFocusPilot, SkillFocusRide, SkillFocusStealth,
+	SkillFocusSurvival, SkillFocusSwim, SkillFocusTreatInjury, SkillFocusUseComputer, SkillFocusUseForce,
+	StrongInTheForce,
 	SurgicalExpertise, Throw, Toughness, Trip, TripleAttack,
 	TripleCrit, VehicularCombat, WeaponFiness,
 	WhirlwindAttack,
@@ -70,15 +82,20 @@ enum gender_s : unsigned char {
 };
 struct creature
 {
+	specie_s				type;
 	gender_s				gender;
+	//
+	static creature*		create(bool interactive = false, bool setplayer = false);
 	int						getbonus(ability_s id) const;
 	bool					is(feat_s id) const;
 	void					set(class_s id, bool interactive = true);
 	void					set(feat_s id, bool value = true);
+	void					set(specie_s id, bool value = true);
 private:
+	void					chooseabilities(bool interactive);
 	void					chooseclass(bool interactive);
 	void					choosegender(bool interactive);
-	unsigned char			ability[6];
-	unsigned char			classes[Beast+1];
+	char					abilities[6];
+	char					classes[Beast+1];
 	unsigned char			feats[LastFeat / 8 + 1];
 };

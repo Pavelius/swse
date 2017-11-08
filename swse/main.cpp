@@ -3,6 +3,7 @@
 int	main(int argc, char *argv[])
 {
 	logs::open("SW");
+	creature::create(true, true);
 	return 0;
 }
 
