@@ -137,5 +137,20 @@
     <ClCompile Include="print.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="feat.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="creature.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="creature_create.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="class.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="specie.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
