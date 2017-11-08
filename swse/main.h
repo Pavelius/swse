@@ -69,6 +69,9 @@ enum feat_s : unsigned short {
 	StrongInTheForce,
 	SurgicalExpertise, Throw, Toughness, Trip, TripleAttack,
 	TripleCrit, VehicularCombat, WeaponFiness,
+	WeaponProficiencyAdvancedMeleeWeapons, WeaponProficiencyExoticWeapons,
+	WeaponProficiencyHeavyWeapons, WeaponProficiencyLightsabers, WeaponProficiencyPistols,
+	WeaponProficiencyRifles, WeaponProficiencySimpleWeapons,
 	WhirlwindAttack,
 	// Races feats
 	Primitive, LowlightVision, Darkvision,
@@ -78,17 +81,17 @@ enum feat_s : unsigned short {
 	Rage, Scent,
 	FirstFeat = AdeptNegotiator, LastFeat = Scent,
 };
+typedef adat<feat_s, 8>		feata;
 enum gender_s : unsigned char {
 	Male, Female,
 };
 struct creature
 {
-	specie_s				type;
+	specie_s				specie;
 	gender_s				gender;
 	//
 	static creature*		create(bool interactive = false, bool setplayer = false);
 	int						getbonus(ability_s id) const;
-	int						getskillpoints() const;
 	bool					is(feat_s id) const;
 	bool					is(skill_s id) const;
 	bool					isclass(skill_s id) const;
@@ -98,7 +101,7 @@ struct creature
 	void					set(skill_s id, bool value = true);
 private:
 	void					chooseabilities(bool interactive);
-	void					chooseclass(bool interactive);
+	static class_s			chooseclass(bool interactive);
 	void					choosegender(bool interactive);
 	void					chooseskill(bool interactive, int count);
 	char					abilities[6];
@@ -106,3 +109,8 @@ private:
 	unsigned char			feats[LastFeat / 8 + 1];
 	unsigned char			skills[LastSkill / 8 + 1];
 };
+namespace game
+{
+	int						getskillpoints(class_s id);
+}
+feata&						getfeats(class_s id);

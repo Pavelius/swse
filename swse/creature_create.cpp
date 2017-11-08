@@ -42,13 +42,12 @@ static void print_rolled(char* result, const char* title, char* values, bool sho
 		zcat(p, ".");
 }
 
-void creature::chooseclass(bool interactive)
+class_s creature::chooseclass(bool interactive)
 {
 	for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
 		logs::add(i, getstr(i));
 	logs::sort();
-	auto result = (class_s)logs::input(interactive, false, "Выбрайте [класс]:");
-	set(result);
+	return (class_s)logs::input(interactive, false, "Выбрайте [класс]:");
 }
 
 void creature::choosegender(bool interactive)
@@ -82,12 +81,21 @@ void creature::chooseskill(bool interactive, int count)
 	}
 }
 
+char roll_4d6()
+{
+	char temp[4];
+	for(auto& e : temp)
+		e = (rand() % 6) + 1;
+	qsort(temp, sizeof(temp) / sizeof(temp[0]), sizeof(temp[0]), compare_result);
+	return temp[0] + temp[1] + temp[2];
+}
+
 void creature::chooseabilities(bool interactive)
 {
 	char temp[6];
 	memset(abilities, 0, sizeof(abilities));
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
-		temp[i] = (rand() % 6) + (rand() % 6) + (rand() % 6) + 3;
+		temp[i] = roll_4d6();
 	qsort(temp, sizeof(temp) / sizeof(temp[0]), sizeof(temp[0]), compare_result);
 	while(temp[0])
 	{
@@ -109,9 +117,10 @@ creature* creature::create(bool interactive, bool setplayer)
 {
 	auto p = creatures.add();
 	p->choosegender(interactive);
-	p->chooseclass(interactive);
+	auto cls = p->chooseclass(interactive);
 	p->chooseabilities(interactive);
-	auto sp = p->getbonus(Intellegence);
+	p->set(cls);
+	auto sp = imax(1, game::getskillpoints(cls) + p->getbonus(Intellegence));
 	p->chooseskill(interactive, sp);
 	return p;
 }

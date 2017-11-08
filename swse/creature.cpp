@@ -15,7 +15,7 @@ void creature::set(feat_s id, bool value)
 
 bool creature::is(skill_s id) const
 {
-	return false;
+	return (skills[id / 8] & (1 << (id % 8))) != 0;
 }
 
 void creature::set(skill_s id, bool value)

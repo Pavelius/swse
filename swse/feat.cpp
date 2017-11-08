@@ -138,6 +138,13 @@ static struct feat_i
 	{{"Triple critical"}, General},
 	{{"Vehicular combat"}, General},
 	{{"Weapon finess"}, General},
+	{{"Weapon proficiency (Advanced Melee Weapons)"}, General},
+	{{"Weapon proficiency (Exotic Weapons)"}, General},
+	{{"Weapon proficiency (Heavy Weapons)"}, General},
+	{{"Weapon proficiency (Lightsabers)"}, General},
+	{{"Weapon proficiency (Pistols)"}, General},
+	{{"Weapon proficiency (Rifles)"}, General},
+	{{"Weapon proficiency (Simple Weapons)"}, General},
 	{{"Whirlwind attack"}, General},
 	//
 	{{"Primitive", "Примитивный"}, RacialFeat},

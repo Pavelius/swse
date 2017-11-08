@@ -4,7 +4,7 @@ static struct specie_i
 {
 	const char*			name[2];
 	char				abilities[6];
-	adat<feat_s, 8>		feats;
+	feata				starting_feats;
 } specie_data[] = {
 	{{"No species", "Нет расы"}},
 	{{"Human", "Человек"}, {0, 0, 0, 0, 0, 0}},
@@ -28,7 +28,13 @@ static struct specie_i
 
 void creature::set(specie_s id, bool value)
 {
-	type = id;
+	specie = id;
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
 		abilities[i] += specie_data[id].abilities[i];
+	for(auto e : specie_data[id].starting_feats)
+	{
+		if(is(e))
+			continue;
+		set(e);
+	}
 }
