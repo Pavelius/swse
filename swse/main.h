@@ -34,7 +34,8 @@ enum skill_s : char {
 	Initiative, Jump, Buerocracy, GalacticLore, LifeSciences,
 	PhysicalSciences, SocialSciences, Tactics, Technology, Mechanics,
 	Perception, Persuasion, Pilot, Ride, Stealth,
-	Survival, Swim, TreatInjury, UseComputer, UseForce
+	Survival, Swim, TreatInjury, UseComputer, UseForce,
+	FirstSkill = Acrobatic, LastSkill = UseForce,
 };
 enum feat_s : unsigned short {
 	// Jedi
@@ -87,15 +88,21 @@ struct creature
 	//
 	static creature*		create(bool interactive = false, bool setplayer = false);
 	int						getbonus(ability_s id) const;
+	int						getskillpoints() const;
 	bool					is(feat_s id) const;
+	bool					is(skill_s id) const;
+	bool					isclass(skill_s id) const;
 	void					set(class_s id, bool interactive = true);
 	void					set(feat_s id, bool value = true);
 	void					set(specie_s id, bool value = true);
+	void					set(skill_s id, bool value = true);
 private:
 	void					chooseabilities(bool interactive);
 	void					chooseclass(bool interactive);
 	void					choosegender(bool interactive);
+	void					chooseskill(bool interactive, int count);
 	char					abilities[6];
 	char					classes[Beast+1];
 	unsigned char			feats[LastFeat / 8 + 1];
+	unsigned char			skills[LastSkill / 8 + 1];
 };

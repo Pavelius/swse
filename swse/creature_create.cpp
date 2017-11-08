@@ -59,12 +59,36 @@ void creature::choosegender(bool interactive)
 	gender = (gender_s)logs::input(interactive, false, "Выбрайте [пол]:");
 }
 
+static int compare_result(const void* v1, const void* v2)
+{
+	return *((char*)v2) - *((char*)v1);
+}
+
+void creature::chooseskill(bool interactive, int count)
+{
+	while(count > 0)
+	{
+		for(auto i = FirstSkill; i <= LastSkill; i = (skill_s)(i + 1))
+		{
+			if(is(i))
+				continue;
+			if(!isclass(i))
+				continue;
+			logs::add(i, getstr(i));
+		};
+		logs::sort();
+		auto result = (skill_s)logs::input(interactive, true, "Выбирайте навык (осталось [%1i])", count--);
+		set(result);
+	}
+}
+
 void creature::chooseabilities(bool interactive)
 {
 	char temp[6];
 	memset(abilities, 0, sizeof(abilities));
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
 		temp[i] = (rand() % 6) + (rand() % 6) + (rand() % 6) + 3;
+	qsort(temp, sizeof(temp) / sizeof(temp[0]), sizeof(temp[0]), compare_result);
 	while(temp[0])
 	{
 		logs::add("\n"); print_rolled(logs::getptr(), "Вы выбросили", temp, false);
@@ -77,12 +101,8 @@ void creature::chooseabilities(bool interactive)
 		};
 		auto result = (ability_s)logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", temp[0]);
 		abilities[result] = temp[0];
-		memcpy(temp, temp + 1, 5);
+		memcpy(temp, temp + 1, 5); temp[5] = 0;
 	}
-}
-
-void creature::set(class_s id, bool interactive)
-{
 }
 
 creature* creature::create(bool interactive, bool setplayer)
@@ -91,5 +111,7 @@ creature* creature::create(bool interactive, bool setplayer)
 	p->choosegender(interactive);
 	p->chooseclass(interactive);
 	p->chooseabilities(interactive);
+	auto sp = p->getbonus(Intellegence);
+	p->chooseskill(interactive, sp);
 	return p;
 }

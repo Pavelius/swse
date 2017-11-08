@@ -157,6 +157,7 @@
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="print.cpp" />
+    <ClCompile Include="skill.cpp" />
     <ClCompile Include="specie.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="stringcreator.cpp" />

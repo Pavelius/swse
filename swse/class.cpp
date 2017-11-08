@@ -15,3 +15,13 @@ static struct class_i
 };
 assert_enum(class, Beast);
 getstr_enum(class);
+
+void creature::set(class_s id, bool interactive)
+{
+	classes[id]++;
+}
+
+int creature::getskillpoints() const
+{
+
+}
