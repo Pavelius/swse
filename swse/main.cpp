@@ -4,7 +4,8 @@ int	main(int argc, char *argv[])
 {
 	logs::open("SW");
 	location test;
-	creature::create(false, true);
+	creature::create(&test, false, true);
+	creature::create(&test, false, false);
 	test.create();
 	test.acting();
 	return 0;

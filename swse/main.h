@@ -108,13 +108,15 @@ struct location
 	void					acting();
 	void					clear();
 	void					create();
-	void					getdescription(char* result);
+	void					getdescription(char* result, struct creature** source, unsigned source_index);
 };
 struct creature
 {
-	location::place**		position;
-	static creature*		create(bool interactive = false, bool setplayer = false);
-	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
+	struct location*		location;
+	char					index;
+	operator bool() const { return specie != NoSpecies; }
+	static creature*		create(struct location* pv = 0, bool interactive = false, bool setplayer = false);
+	static creature*		create(specie_s specie, gender_s gender, class_s cls, struct location* pv, bool interactive, bool setplayer);
 	int						get(class_s id) const { return classes[id]; }
 	int						getbonus(ability_s id) const;
 	bool					is(feat_s id) const;
