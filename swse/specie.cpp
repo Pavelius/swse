@@ -5,9 +5,10 @@ static struct specie_i
 	const char*			name[2];
 	char				abilities[6];
 	feata				starting_feats;
+	char				bonus_skills, bonus_feats;
 } specie_data[] = {
 	{{"No species", "Нет расы"}},
-	{{"Human", "Человек"}, {0, 0, 0, 0, 0, 0}},
+	{{"Human", "Человек"}, {0, 0, 0, 0, 0, 0}, {}, 1, 1},
 	{{"Bothan", "Ботан"}, {0, 2, -2, 0, 0, 0}, {1, {IronWill}}},
 	{{"Cerean", "Цереан"}, {0, -2, 0, 2, 2, 0}},
 	{{"Duros", "Дурос"}, {0, 2, -2, 2, 0, 0}},
@@ -25,8 +26,10 @@ static struct specie_i
 	{{"Zabrak", "Забрак"}, {0, 0, 0, 0, 0, 0}},
 	{{"Wookie", "Вуки"}, {4, -2, 2, 0, -2, -2}},
 };
+assert_enum(specie, Wookie);
+getstr_enum(specie);
 
-void creature::set(specie_s id, bool value)
+void creature::set(specie_s id)
 {
 	specie = id;
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
@@ -37,4 +40,18 @@ void creature::set(specie_s id, bool value)
 			continue;
 		set(e);
 	}
+}
+
+int	creature::getskills() const
+{
+	auto result = 0;
+	for(auto e = Jedi; e <= Soldier; e = (class_s)(e + 1))
+	{
+		if(!get(e))
+			continue;
+		result += game::getskillpoints(e);
+	}
+	result += getbonus(Intellegence);
+	result += specie_data[specie].bonus_skills;
+	return result;
 }

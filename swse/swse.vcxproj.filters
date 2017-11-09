@@ -158,5 +158,8 @@
     <ClCompile Include="skill.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="location.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

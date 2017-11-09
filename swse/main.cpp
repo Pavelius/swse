@@ -3,7 +3,10 @@
 int	main(int argc, char *argv[])
 {
 	logs::open("SW");
-	creature::create(true, true);
+	location test;
+	creature::create(false, true);
+	test.create();
+	test.acting();
 	return 0;
 }
 

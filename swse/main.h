@@ -81,36 +81,68 @@ enum feat_s : unsigned short {
 	Rage, Scent,
 	FirstFeat = AdeptNegotiator, LastFeat = Scent,
 };
-typedef adat<feat_s, 8>		feata;
 enum gender_s : unsigned char {
 	Male, Female,
 };
+enum morph_s : unsigned char {
+	Masculine, Feminine, Neuter
+};
+typedef adat<feat_s, 8>		feata;
+struct location
+{
+	struct scene
+	{
+		char				size;
+		const char*			description[2];
+	};
+	struct place
+	{
+		struct scenery*		type;
+		unsigned short		flags;
+		const char*			getname() const;
+		const char*			getnameto() const;
+	};
+	scene*					type;
+	place					places[4];
+	//
+	void					acting();
+	void					clear();
+	void					create();
+	void					getdescription(char* result);
+};
 struct creature
 {
-	specie_s				specie;
-	gender_s				gender;
-	//
+	location::place**		position;
 	static creature*		create(bool interactive = false, bool setplayer = false);
+	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
+	int						get(class_s id) const { return classes[id]; }
 	int						getbonus(ability_s id) const;
 	bool					is(feat_s id) const;
 	bool					is(skill_s id) const;
 	bool					isclass(skill_s id) const;
 	void					set(class_s id, bool interactive = true);
-	void					set(feat_s id, bool value = true);
-	void					set(specie_s id, bool value = true);
+	void					set(feat_s id, bool interactive = true);
+	void					set(gender_s id);
 	void					set(skill_s id, bool value = true);
+	void					set(specie_s id);
 private:
-	void					chooseabilities(bool interactive);
-	static class_s			chooseclass(bool interactive);
-	void					choosegender(bool interactive);
-	void					chooseskill(bool interactive, int count);
 	char					abilities[6];
-	char					classes[Beast+1];
+	char					classes[Beast + 1];
 	unsigned char			feats[LastFeat / 8 + 1];
 	unsigned char			skills[LastSkill / 8 + 1];
+	gender_s				gender;
+	specie_s				specie;
+	//
+	void					chooseabilities(bool interactive);
+	static class_s			chooseclass(bool interactive);
+	static gender_s			choosegender(bool interactive);
+	void					chooseskill(bool interactive, int count);
+	static specie_s			choosespecie(bool interactive);
+	int						getskills() const;
 };
 namespace game
 {
 	int						getskillpoints(class_s id);
 }
+extern adat<creature, 512>	creatures;
 feata&						getfeats(class_s id);

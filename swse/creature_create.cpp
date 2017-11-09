@@ -1,17 +1,5 @@
 #include "main.h"
 
-static adat<creature, 256> creatures;
-
-static void print_ability(unsigned char* ability)
-{
-	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
-	{
-		if(i != Strenght)
-			logs::add(", ");
-		logs::add("%1 %2i", getstr(i), ability[i]);
-	}
-}
-
 static void print_rolled(char* result, const char* title, char* values, bool show_names = false)
 {
 	auto p = result;
@@ -42,6 +30,33 @@ static void print_rolled(char* result, const char* title, char* values, bool sho
 		zcat(p, ".");
 }
 
+static void print_skills(char* result, const char* title, creature* player)
+{
+	auto p = result;
+	auto pb = p;
+	for(auto i = FirstSkill; i <= LastSkill; i = (skill_s)(i + 1))
+	{
+		if(player->is(i))
+			continue;
+		if(p == result)
+		{
+			zcat(p, title);
+			zcat(p, ": ");
+			p = zend(p);
+			pb = p;
+		}
+		if(pb != p)
+		{
+			zcat(p, ", ");
+			p = zend(p);
+		}
+		szprint(p, "%1", getstr(i));
+		p = zend(result);
+	}
+	if(p != result)
+		zcat(p, ".");
+}
+
 class_s creature::chooseclass(bool interactive)
 {
 	for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
@@ -50,12 +65,19 @@ class_s creature::chooseclass(bool interactive)
 	return (class_s)logs::input(interactive, false, "Выбрайте [класс]:");
 }
 
-void creature::choosegender(bool interactive)
+specie_s creature::choosespecie(bool interactive)
+{
+	for(auto i = Human; i <= Wookie; i = (specie_s)(i + 1))
+		logs::add(i, getstr(i));
+	logs::sort();
+	return (specie_s)logs::input(interactive, false, "Выбрайте [расу]:");
+}
+
+gender_s creature::choosegender(bool interactive)
 {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");
-	logs::sort();
-	gender = (gender_s)logs::input(interactive, false, "Выбрайте [пол]:");
+	return (gender_s)logs::input(interactive, false, "Выбрайте [пол]:");
 }
 
 static int compare_result(const void* v1, const void* v2)
@@ -115,12 +137,21 @@ void creature::chooseabilities(bool interactive)
 
 creature* creature::create(bool interactive, bool setplayer)
 {
+	auto p2 = choosespecie(interactive);
+	auto p1 = choosegender(interactive);
+	auto p3 = chooseclass(interactive);
+	return create(p2, p1, p3,
+		interactive,
+		setplayer);
+}
+
+creature* creature::create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer)
+{
 	auto p = creatures.add();
-	p->choosegender(interactive);
-	auto cls = p->chooseclass(interactive);
 	p->chooseabilities(interactive);
+	p->gender = gender;
+	p->set(specie);
 	p->set(cls);
-	auto sp = imax(1, game::getskillpoints(cls) + p->getbonus(Intellegence));
-	p->chooseskill(interactive, sp);
+	p->chooseskill(interactive, p->getskills());
 	return p;
 }
