@@ -4,10 +4,9 @@ static struct action_i
 {
 	feat_s			feat;
 	const char*		text;
-	bool			(creature::*test)();
+	bool			(creature::*condition)();
+	bool			(creature::*targetable)();
 } action_data[] = {
-	{WeaponProficiencySimpleWeapons, "Атаковать врага"},
-	{WeaponProficiencyPistols, "Стрелять по врагу"},
 	{BurstFire, "Дать короткую очередь"},
 	{BanthaRush, "С криком броситься на врага в рукопашную"},
 	{AcrobaticStrike, "Сделать пирует и атаковать врага"}
@@ -45,6 +44,7 @@ void creature::combatactions(creaturea& enemies, bool interactive)
 	{
 		if(!is(action_data[i].feat))
 			continue;
+		logs::add(i, action_data[i].text);
 	}
 }
 
