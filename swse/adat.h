@@ -9,6 +9,7 @@ struct adat
 	T						data[count_max];
 	//
 	inline T&				operator[](int index) { return data[index]; }
+	inline operator			bool() const { return count!=0; }
 	//
 	T*						add() { if(count < count_max) return data + (count++); return 0; }
 	void					add(const T& e) { if(count < count_max) data[count++] = e; }

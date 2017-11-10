@@ -140,6 +140,7 @@
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="class.cpp" />
     <ClCompile Include="color.cpp" />
+    <ClCompile Include="combat.cpp" />
     <ClCompile Include="command.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="creature_create.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="draw_textf.cpp" />
     <ClCompile Include="feat.cpp" />
     <ClCompile Include="io.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pma.cpp" />

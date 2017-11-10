@@ -135,18 +135,17 @@ void creature::chooseabilities(bool interactive)
 	}
 }
 
-creature* creature::create(struct location* location, bool interactive, bool setplayer)
+creature* creature::create(bool interactive, bool setplayer)
 {
 	auto p2 = choosespecie(interactive);
 	auto p1 = choosegender(interactive);
 	auto p3 = chooseclass(interactive);
 	return create(p2, p1, p3,
-		location,
 		interactive,
 		setplayer);
 }
 
-creature* creature::create(specie_s specie, gender_s gender, class_s cls, struct location* pv, bool interactive, bool setplayer)
+creature* creature::create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer)
 {
 	auto p = creatures.add();
 	p->chooseabilities(interactive);
@@ -154,6 +153,7 @@ creature* creature::create(specie_s specie, gender_s gender, class_s cls, struct
 	p->set(specie);
 	p->set(cls);
 	p->chooseskill(interactive, p->getskills());
-	p->location = pv;
+	if(setplayer)
+		zcat(players, p);
 	return p;
 }
