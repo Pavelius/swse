@@ -26,11 +26,13 @@ enum specie_s : char {
 	FirstSpecies = Human, LastSpecies = Wookie
 };
 enum talent_s : char {
+	NoTalant,
 	General, Skills, RacialFeat,
 	JediConsular, JediGuardian, JediSentinel, LightsaberCombat,
 	Influence, Inspiration, Leadership, Lineage,
 };
 enum feat_s : unsigned short {
+	NoFeat,
 	// Jedi
 	AdeptNegotiator, ForcePersuasion, MasterNegotiator, SkilledAdvisor,
 	AcrobaticRecovery, BattleMeditation, ElusiveTarget, ForceIntuition, Resilience,
@@ -66,6 +68,7 @@ enum feat_s : unsigned short {
 	WeaponProficiencyHeavyWeapons, WeaponProficiencyLightsabers, WeaponProficiencyPistols,
 	WeaponProficiencyRifles, WeaponProficiencySimpleWeapons,
 	WhirlwindAttack,
+	// Skills
 	Acrobatic, Climb, Deception, Endurance, GatherInformation,
 	Initiative, Jump, Buerocracy, GalacticLore, LifeSciences,
 	PhysicalSciences, SocialSciences, Tactics, Technology, Mechanics,
@@ -154,6 +157,7 @@ struct attackinfo
 };
 struct creature
 {
+	typedef bool(creature::*testing)(const creature*) const;
 	item					wears[Armor + 1];
 	item					gears[8];
 	operator bool() const { return specie != NoSpecies; }
@@ -177,6 +181,7 @@ struct creature
 	bool					is(feat_s id) const;
 	bool					isactive() const;
 	bool					isclass(feat_s id) const;
+	bool					isenemy(const creature* e) const;
 	void					remove(feat_s id);
 	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
@@ -194,6 +199,7 @@ private:
 	specie_s				specie;
 	short					hits;
 	char					initiative;
+	short					position;
 	side_s					side;
 	//
 	void					chooseabilities(bool interactive);

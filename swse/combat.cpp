@@ -3,13 +3,40 @@
 static struct action_i
 {
 	feat_s			feat;
+	wear_s			weapon;
 	const char*		text;
-	bool			(creature::*condition)();
-	bool			(creature::*targetable)();
+	bool			(creature::*t0)() const;
+	bool			(creature::*t1)(const creature*) const;
+	bool			(creature::*t2)(const creature*) const;
+
+	bool match(const creature* player, const creature* opponent) const
+	{
+		if(t1 && !(player->*t1)(opponent))
+			return false;
+		if(t2 && !(player->*t2)(opponent))
+			return false;
+		return true;
+	}
+
+	bool match(const creature* player, creaturea& combatants) const
+	{
+		for(auto p : combatants)
+		{
+			if(!p->isactive())
+				continue;
+			if(match(player, p))
+				return true;
+		}
+		return false;
+	}
+
 } action_data[] = {
-	{BurstFire, "Дать короткую очередь"},
-	{BanthaRush, "С криком броситься на врага в рукопашную"},
-	{AcrobaticStrike, "Сделать пирует и атаковать врага"}
+	{BurstFire, RangedWeapon, "Дать короткую очередь в одну цель", 0, &creature::isenemy},
+	{BanthaRush, MeleeWeapon, "С криком броситься на врага в рукопашную"},
+	{AcrobaticStrike, MeleeWeapon, "Сделать пирует и атаковать врага"},
+	{ChargingFire, RangedWeapon, "С криком броситься на врага, стреляя в него на бегу"},
+	{NoFeat, MeleeWeapon, "Нанести удар противнику"},
+	{NoFeat, RangedWeapon, "Стрельнуть по противнику"}
 };
 
 static int compare_initiative(const void* p1, const void* p2)
@@ -38,14 +65,27 @@ static creature* getmelee(creaturea& enemies)
 	return enemies.data[0];
 }
 
+static bool test(creature* player, creaturea& enemies, creature::testing t1)
+{
+	for(auto p : enemies)
+	{
+		if(t1 && !(player->*t1)(p))
+			continue;
+	}
+	return false;
+}
+
 void creature::combatactions(creaturea& enemies, bool interactive)
 {
 	for(unsigned i=0; i<lenghtof(action_data); i++)
 	{
-		if(!is(action_data[i].feat))
+		if(action_data[i].feat && !is(action_data[i].feat))
+			continue;
+		if(!action_data[i].match(this, enemies))
 			continue;
 		logs::add(i, action_data[i].text);
 	}
+	auto id = logs::input(interactive, false, "Что будет делать [%1]?", getname());
 }
 
 void game::combat(bool interactive)

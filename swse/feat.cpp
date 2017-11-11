@@ -17,6 +17,8 @@ static struct feat_i
 	talent_s				tree;
 	prerequisit_i			require;
 } feat_data[] = {
+	{{"", ""}},
+	//
 	{{"Adept negotiator"}, JediConsular},
 	{{"Force persuasion"}, JediConsular, {{1, {AdeptNegotiator}}}},
 	{{"Master negotiator"}, JediConsular, {{1, {AdeptNegotiator}}}},

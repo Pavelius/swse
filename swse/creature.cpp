@@ -194,3 +194,8 @@ void creature::rollinitiative()
 {
 	initiative = roll(Initiative, 0, false);
 }
+
+bool creature::isenemy(const creature* e) const
+{
+	return getside() == e->getside();
+}

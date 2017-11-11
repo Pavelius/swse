@@ -35,15 +35,20 @@ static struct skill_i
 
 bool creature::isclass(feat_s id) const
 {
-	for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
+	if(id >= FirstSkill && id <= LastSkill)
 	{
-		if(classes[i] && skill_data[id-FirstSkill].class_skills[i])
-			return true;
+		for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
+		{
+			if(classes[i] && skill_data[id - FirstSkill].class_skills[i])
+				return true;
+		}
 	}
 	return false;
 }
 
 ability_s game::getability(feat_s id)
 {
-	return skill_data[id-FirstSkill].ability;
+	if(id >= FirstSkill && id <= LastSkill)
+		return skill_data[id-FirstSkill].ability;
+	return Dexterity;
 }
