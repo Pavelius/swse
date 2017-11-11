@@ -32,20 +32,18 @@ static struct skill_i
 	{{"Use Computer", "Использовать компьютер"}, {0, 1, 1, 0, 1}, Intellegence},
 	{{"Use Force", "Использовать силу"}, {1, 0, 0, 0, 0}, Charisma},
 };
-assert_enum(skill, LastSkill);
-getstr_enum(skill);
 
-bool creature::isclass(skill_s id) const
+bool creature::isclass(feat_s id) const
 {
 	for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
 	{
-		if(classes[i] && skill_data[id].class_skills[i])
+		if(classes[i] && skill_data[id-FirstSkill].class_skills[i])
 			return true;
 	}
 	return false;
 }
 
-ability_s game::getability(skill_s id)
+ability_s game::getability(feat_s id)
 {
-	return skill_data[id].ability;
+	return skill_data[id-FirstSkill].ability;
 }

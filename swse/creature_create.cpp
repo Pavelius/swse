@@ -34,7 +34,7 @@ static void print_skills(char* result, const char* title, creature* player)
 {
 	auto p = result;
 	auto pb = p;
-	for(auto i = FirstSkill; i <= LastSkill; i = (skill_s)(i + 1))
+	for(auto i = FirstSkill; i <= LastSkill; i = (feat_s)(i + 1))
 	{
 		if(player->is(i))
 			continue;
@@ -89,7 +89,7 @@ void creature::chooseskill(bool interactive, int count)
 {
 	while(count > 0)
 	{
-		for(auto i = FirstSkill; i <= LastSkill; i = (skill_s)(i + 1))
+		for(auto i = FirstSkill; i <= LastSkill; i = (feat_s)(i + 1))
 		{
 			if(is(i))
 				continue;
@@ -98,7 +98,7 @@ void creature::chooseskill(bool interactive, int count)
 			logs::add(i, getstr(i));
 		};
 		logs::sort();
-		auto result = (skill_s)logs::input(interactive, true, "Выбирайте навык (осталось [%1i])", count--);
+		auto result = (feat_s)logs::input(interactive, true, "Выбирайте навык (осталось [%1i])", count--);
 		set(result);
 	}
 }

@@ -54,40 +54,6 @@ void location::create()
 	places[2].type = source[2];
 }
 
-static unsigned select(creature** result, unsigned count, creature** source, unsigned source_count, location* parent, char index)
-{
-	auto p = result;
-	auto pe = result + count;
-	for(unsigned i = 0; i<source_count; i++)
-	{
-		if(!source[i])
-			continue;
-		if(source[i]->location != parent)
-			continue;
-		if(index!=-1 && source[i]->index != index)
-			continue;
-		if(p<pe)
-			*p++ = source[i];
-	}
-	return p - result;
-}
-
-static unsigned select(creature** result, unsigned count, location* parent)
-{
-	auto p = result;
-	auto pe = result + count;
-	for(auto& e : creatures)
-	{
-		if(!e)
-			continue;
-		if(e.location != parent)
-			continue;
-		if(p<pe)
-			*p++ = &e;
-	}
-	return p - result;
-}
-
 static void show_figure(char* result, creature* p)
 {
 	szprint(result, "Здесь стоял%1 %2.", p->getA(), p->getname());
@@ -95,8 +61,8 @@ static void show_figure(char* result, creature* p)
 
 char* look(char* result, const char* format, creature** source, unsigned source_count, location* p, char index)
 {
-	creature* figures[32];
-	auto figures_count = select(figures, sizeof(figures) / sizeof(figures[0]), source, source_count, p, index);
+	//creature* figures[32];
+	//auto figures_count = select(figures, sizeof(figures) / sizeof(figures[0]), source, source_count, p, index);
 	szprint(result, format, p->type->description[0], p->places[index].getname());
 	return zend(result);
 }
@@ -111,13 +77,11 @@ void location::getdescription(char* result, creature** source, unsigned source_c
 
 void location::acting()
 {
-	creature* source[64];
-	unsigned source_count = select(source, sizeof(source) / sizeof(source[0]), this);
 	bool interactive = true;
 	auto position = 0;
 	while(true)
 	{
-		getdescription(logs::getptr(), source, source_count);
+		getdescription(logs::getptr(), 0, 0);
 		logs::add(1, "Всем двигаться к %1.", places[0].getname());
 		auto id = logs::input(interactive, true, "Что будете делать?");
 	}

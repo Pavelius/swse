@@ -26,17 +26,9 @@ enum specie_s : char {
 	FirstSpecies = Human, LastSpecies = Wookie
 };
 enum talent_s : char {
-	General, RacialFeat,
+	General, Skills, RacialFeat,
 	JediConsular, JediGuardian, JediSentinel, LightsaberCombat,
 	Influence, Inspiration, Leadership, Lineage,
-};
-enum skill_s : char {
-	Acrobatic, Climb, Deception, Endurance, GatherInformation,
-	Initiative, Jump, Buerocracy, GalacticLore, LifeSciences,
-	PhysicalSciences, SocialSciences, Tactics, Technology, Mechanics,
-	Perception, Persuasion, Pilot, Ride, Stealth,
-	Survival, Swim, TreatInjury, UseComputer, UseForce,
-	FirstSkill = Acrobatic, LastSkill = UseForce,
 };
 enum feat_s : unsigned short {
 	// Jedi
@@ -74,6 +66,12 @@ enum feat_s : unsigned short {
 	WeaponProficiencyHeavyWeapons, WeaponProficiencyLightsabers, WeaponProficiencyPistols,
 	WeaponProficiencyRifles, WeaponProficiencySimpleWeapons,
 	WhirlwindAttack,
+	Acrobatic, Climb, Deception, Endurance, GatherInformation,
+	Initiative, Jump, Buerocracy, GalacticLore, LifeSciences,
+	PhysicalSciences, SocialSciences, Tactics, Technology, Mechanics,
+	Perception, Persuasion, Pilot, Ride, Stealth,
+	Survival, Swim, TreatInjury, UseComputer, UseForce,
+	FirstSkill = Acrobatic, LastSkill = UseForce,
 	// Races feats
 	Primitive, LowlightVision, Darkvision,
 	ExpertSwimmer, ExpertPilot, ExpertClimber, Sneaky, SurvivalInstinct, IntuitiveInitiative, KeenForceSence, HeightenAwareness, Deceptive, ExtraordinaryRecuperation,
@@ -156,10 +154,6 @@ struct attackinfo
 };
 struct creature
 {
-	struct location*		location;
-	char					index;
-	char					initiative;
-	side_s					side;
 	item					wears[Armor + 1];
 	item					gears[8];
 	operator bool() const { return specie != NoSpecies; }
@@ -168,7 +162,7 @@ struct creature
 	static creature*		create(bool interactive = false, bool setplayer = false);
 	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	void					damage(int count, bool interactive);
-	int						get(skill_s id) const;
+	int						get(feat_s id) const;
 	int						get(class_s id) const { return classes[id]; }
 	int						get(defence_s id) const;
 	const char*				getA() const { return gender == Female ? "а" : ""; }
@@ -178,26 +172,29 @@ struct creature
 	void					getenemies(creaturea& result, const creaturea& source) const;
 	int						getheroiclevel() const;
 	const char*				getname() const { return "ѕитер"; }
+	int						getinitiative() const { return initiative; }
+	side_s					getside() const { return side; }
 	bool					is(feat_s id) const;
-	bool					is(skill_s id) const;
 	bool					isactive() const;
-	bool					isclass(skill_s id) const;
-	void					remove(skill_s id);
-	int						roll(skill_s id, int dc = 0, bool interactive = true) const;
+	bool					isclass(feat_s id) const;
+	void					remove(feat_s id);
+	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
+	void					rollinitiative();
 	void					set(class_s id, bool interactive = true);
 	void					set(feat_s id, bool interactive = true);
 	void					set(gender_s id);
-	void					set(skill_s id);
 	void					set(specie_s id);
+	void					set(side_s id);
 private:
 	char					abilities[6];
 	char					classes[Beast + 1];
 	unsigned char			feats[LastFeat / 8 + 1];
-	unsigned char			skills[LastSkill / 8 + 1];
 	gender_s				gender;
 	specie_s				specie;
 	short					hits;
+	char					initiative;
+	side_s					side;
 	//
 	void					chooseabilities(bool interactive);
 	static class_s			chooseclass(bool interactive);
@@ -209,7 +206,7 @@ private:
 namespace game
 {
 	void					combat(bool interactive);
-	ability_s 				getability(skill_s id);
+	ability_s 				getability(feat_s id);
 	int						getskillpoints(class_s id);
 }
 extern adat<creature, 512>	creatures;

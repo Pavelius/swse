@@ -14,20 +14,20 @@ static struct action_i
 
 static int compare_initiative(const void* p1, const void* p2)
 {
-	return (*((creature**)p2))->initiative
-		- (*((creature**)p1))->initiative;
+	return (*((creature**)p2))->getinitiative()
+		- (*((creature**)p1))->getinitiative();
 }
 
 static bool iscombat(creaturea& source)
 {
 	if(!source.count)
 		return false;
-	auto side = source.data[0]->side;
+	auto side = source.data[0]->getside();
 	for(auto p : source)
 	{
 		if(!p->isactive())
 			continue;
-		if(p->side != side)
+		if(p->getside() != side)
 			return true;
 	}
 	return false;
@@ -56,15 +56,15 @@ void game::combat(bool interactive)
 	{
 		if(!p)
 			continue;
-		p->side = PartySide;
+		p->set(PartySide);
 		source.add(p);
 	}
 	auto p = creature::create(false, false);
-	p->side = EnemySide;
+	p->set(EnemySide);
 	source.add(p);
 	// 2 - roll initiative
 	for(auto p : source)
-		p->initiative = p->roll(Initiative, 0, false);
+		p->rollinitiative();
 	qsort(source.data, source.count, sizeof(source.data[0]), compare_initiative);
 	// 3 - run combat
 	while(iscombat(source))

@@ -8,27 +8,15 @@ bool creature::is(feat_s id) const
 	return (feats[id / 8] & (1 << (id % 8))) != 0;
 }
 
-void creature::set(feat_s id, bool value)
+void creature::set(feat_s id, bool interactive)
 {
-	if(value)
-		feats[id / 8] |= (1 << (id % 8));
-	else
-		feats[id / 8] &= ~(1 << (id % 8));
+	feats[id / 8] |= (1 << (id % 8));
+//	feats[id / 8] &= ~(1 << (id % 8));
 }
 
-bool creature::is(skill_s id) const
+void creature::remove(feat_s id)
 {
-	return (skills[id / 8] & (1 << (id % 8))) != 0;
-}
-
-void creature::set(skill_s id)
-{
-	skills[id / 8] |= (1 << (id % 8));
-}
-
-void creature::remove(skill_s id)
-{
-	skills[id / 8] &= ~(1 << (id % 8));
+	feats[id / 8] &= ~(1 << (id % 8));
 }
 
 int creature::getbonus(ability_s id) const
@@ -41,7 +29,7 @@ void creature::set(gender_s id)
 	gender = id;
 }
 
-int	creature::get(skill_s id) const
+int	creature::get(feat_s id) const
 {
 	auto result = getheroiclevel() / 2;
 	if(is(id))
@@ -74,7 +62,7 @@ int	creature::get(defence_s id) const
 	return result;
 }
 
-int	creature::roll(skill_s id, int dc, bool interactive) const
+int	creature::roll(feat_s id, int dc, bool interactive) const
 {
 	return roll(get(id), dc, interactive, 0);
 }
@@ -195,4 +183,14 @@ void creature::getenemies(creaturea& result, const creaturea& source) const
 			continue;
 		result.add(e);
 	}
+}
+
+void creature::set(side_s value)
+{
+	side = value;
+}
+
+void creature::rollinitiative()
+{
+	initiative = roll(Initiative, 0, false);
 }
