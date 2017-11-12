@@ -12,25 +12,25 @@
 #define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
 #define lenghtof(t) (sizeof(t)/sizeof(t[0]))
 
-enum size_s : char {
+enum size_s : unsigned char {
 	SizeFine, SizeDiminutive, SizeTiny,
 	SizeSmall, SizeMeduim, SizeLarge,
 	SizeHuge, SizeGargantuan, SizeCollosal
 };
-enum ability_s : char {
+enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma
 };
-enum class_s : char {
+enum class_s : unsigned char {
 	Jedi, Noble, Scoundrel, Scout, Soldier, NonHero, Beast,
 };
-enum specie_s : char {
+enum specie_s : unsigned char {
 	NoSpecies,
 	Human, Bothan, Cerean, Duros, Ewoks, Gammorean, Gungans, Ithorians,
 	KelDor, MonCalamari, Quarren, Rodians, Sullustans, Txrandoshans, Twileks, Zabrak,
 	Wookie,
 	FirstSpecies = Human, LastSpecies = Wookie
 };
-enum talent_s : char {
+enum talent_s : unsigned char {
 	NoTalant,
 	General, Skills, RacialFeat,
 	JediConsular, JediGuardian, JediSentinel, LightsaberCombat,
@@ -199,6 +199,7 @@ struct creature
 	int						getbaseattack() const;
 	int						getbonus(ability_s id) const;
 	void					getenemies(creaturea& result, const creaturea& source) const;
+	int						getfeats() const;
 	int						getheroiclevel() const;
 	const char*				getname() const;
 	int						getinitiative() const { return initiative; }
@@ -206,10 +207,12 @@ struct creature
 	side_s					getside() const { return side; }
 	size_s					getsize() const { return SizeMeduim; }
 	int						getspeed() const { return 6; }
+	char*					getstatistic(char* result) const;
 	bool					is(feat_s id) const;
 	bool					is(action_s id) const;
 	bool					isactive() const;
 	bool					isallow(action_s id) const;
+	bool					isallow(feat_s id) const;
 	bool					isclass(feat_s id) const;
 	bool					isenemy(const creature* e) const;
 	bool					ismelee() const { return weapon.ismelee(); }
@@ -245,10 +248,13 @@ private:
 	//
 	void					chooseabilities(bool interactive);
 	static class_s			chooseclass(bool interactive);
+	void					choosefeats(bool interactive, feat_s* source, unsigned source_count, int count = 1);
+	void					choosefeats(bool interactive, talent_s talent, int count = 1);
 	static gender_s			choosegender(bool interactive);
 	void					chooseskill(bool interactive, int count);
 	static specie_s			choosespecie(bool interactive);
 	int						getskills() const;
+	unsigned				select(feat_s* result, unsigned result_count, talent_s talent) const;
 };
 namespace game
 {

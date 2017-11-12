@@ -2,10 +2,12 @@
 
 int	main(int argc, char *argv[])
 {
+	auto p1 = getstr(ForceTraining);
+	auto p2 = getstr(DoubleAttack);
 	logs::open("SW");
 	location test;
-	creature::create(Human, Male, Soldier, false, true);
-	game::combat(true);
+	creature::create(true, true);
+	//game::combat(true);
 	test.create();
 	test.acting();
 	return 0;

@@ -164,7 +164,7 @@ int wdt_answers(int x, int y, int width, const char* name, int id, const char* l
 	if(column_count > 1 && medium_width > 200)
 	{
 		unsigned text_width = 0;
-		auto glyph_width = draw::textw("a");
+		auto glyph_width = draw::textw("A");
 		for(auto& e : answers)
 		{
 			unsigned w = zlen(e.text)*glyph_width;

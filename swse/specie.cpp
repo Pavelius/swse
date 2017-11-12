@@ -37,20 +37,8 @@ void creature::set(specie_s id)
 	{
 		if(is(e))
 			continue;
+		if(!isallow(e))
+			continue;
 		set(e);
 	}
-}
-
-int	creature::getskills() const
-{
-	auto result = 0;
-	for(auto e = Jedi; e <= Soldier; e = (class_s)(e + 1))
-	{
-		if(!get(e))
-			continue;
-		result += game::getskillpoints(e);
-	}
-	result += getbonus(Intellegence);
-	result += specie_data[specie].bonus_skills;
-	return result;
 }

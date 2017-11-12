@@ -334,3 +334,26 @@ const char*	creature::getname() const
 {
 	return game::getname(name);
 }
+
+int	creature::getskills() const
+{
+	auto result = 0;
+	for(auto e = Jedi; e <= Soldier; e = (class_s)(e + 1))
+	{
+		if(!get(e))
+			continue;
+		result += game::getskillpoints(e);
+	}
+	result += getbonus(Intellegence);
+	if(is(BonusSkill))
+		result++;
+	return result;
+}
+
+int	creature::getfeats() const
+{
+	auto result = 1;
+	if(is(BonusFeat))
+		result++;
+	return result;
+}

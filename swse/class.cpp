@@ -25,6 +25,8 @@ void creature::set(class_s id, bool interactive)
 	{
 		if(is(e))
 			continue;
+		if(!isallow(e))
+			continue;
 		set(e);
 	}
 }

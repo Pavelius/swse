@@ -1,6 +1,6 @@
 #include "main.h"
 
-static void print_rolled(char* result, const char* title, char* values, bool show_names = false)
+static char* print_rolled(char* result, const char* title, const char* values, bool show_names = false)
 {
 	auto p = result;
 	auto pb = p;
@@ -26,17 +26,18 @@ static void print_rolled(char* result, const char* title, char* values, bool sho
 			sznum(p, values[i]);
 		p = zend(result);
 	}
-	if(p!=result)
+	if(p != result)
 		zcat(p, ".");
+	return zend(p);
 }
 
-static void print_skills(char* result, const char* title, creature* player)
+static char* print_skills(char* result, const char* title, const creature* player)
 {
 	auto p = result;
 	auto pb = p;
 	for(auto i = FirstSkill; i <= LastSkill; i = (feat_s)(i + 1))
 	{
-		if(player->is(i))
+		if(!player->is(i))
 			continue;
 		if(p == result)
 		{
@@ -55,6 +56,50 @@ static void print_skills(char* result, const char* title, creature* player)
 	}
 	if(p != result)
 		zcat(p, ".");
+	return zend(p);
+}
+
+static char* print_feats(char* result, const char* title, const creature* player)
+{
+	auto p = result;
+	auto pb = p;
+	for(auto i = FirstFeat; i <= LastFeat; i = (feat_s)(i + 1))
+	{
+		if(i >= FirstSkill && i <= LastSkill)
+			continue;
+		if(!player->is(i))
+			continue;
+		if(p == result)
+		{
+			zcat(p, title);
+			zcat(p, ": ");
+			p = zend(p);
+			pb = p;
+		}
+		if(pb != p)
+		{
+			zcat(p, ", ");
+			p = zend(p);
+		}
+		szprint(p, "%1", getstr(i));
+		p = zend(result);
+	}
+	if(p != result)
+		zcat(p, ".");
+	return zend(p);
+}
+
+char* creature::getstatistic(char* result) const
+{
+	result[0] = 0;
+	auto p = print_rolled(zend(result), "Атрибуты", abilities, true);
+	if(p != result && zend(result)[-1] != '\n')
+		zcat(p, "\n");
+	p = print_skills(zend(result), "Навыки", this);
+	if(p != result && zend(result)[-1] != '\n')
+		zcat(p, "\n");
+	p = print_feats(zend(result), "Особенности", this);
+	return result;
 }
 
 class_s creature::chooseclass(bool interactive)
@@ -98,9 +143,46 @@ void creature::chooseskill(bool interactive, int count)
 			logs::add(i, getstr(i));
 		};
 		logs::sort();
-		auto result = (feat_s)logs::input(interactive, true, "Выбирайте навык (осталось [%1i])", count--);
+		auto p = logs::getptr(); getstatistic(p);
+		logs::add("\n");
+		logs::add("Выбирайте [навык]");
+		if(count > 1)
+			logs::add("(осталось [%1i])", count);
+		auto result = (feat_s)logs::input(interactive, false);
+		count--; p[0] = 0;
 		set(result);
 	}
+}
+
+void creature::choosefeats(bool interactive, feat_s* source, unsigned source_count, int count)
+{
+	while(count > 0)
+	{
+		for(unsigned i = 0; i < source_count; i++)
+		{
+			if(is(source[i]))
+				continue;
+			if(!isallow(source[i]))
+				continue;
+			logs::add(source[i], getstr(source[i]));
+		};
+		logs::sort();
+		auto p = logs::getptr(); getstatistic(p);
+		logs::add("\n");
+		logs::add("Выбирайте [особенность]");
+		if(count > 1)
+			logs::add("(осталось [%1i])", count);
+		auto result = (feat_s)logs::input(interactive, false);
+		count--; p[0] = 0;
+		set(result);
+	}
+}
+
+void creature::choosefeats(bool interactive, talent_s talent, int count)
+{
+	feat_s source[LastFeat + 1];
+	auto source_count = select(source, lenghtof(source), talent);
+	choosefeats(interactive, source, source_count, count);
 }
 
 static char roll_4d6()
@@ -153,6 +235,7 @@ creature* creature::create(specie_s specie, gender_s gender, class_s cls, bool i
 	p->set(specie);
 	p->set(cls);
 	p->chooseskill(interactive, p->getskills());
+	p->choosefeats(interactive, General, p->getfeats());
 	if(p->getheroiclevel())
 		p->hits = game::getdice(cls) * 3;
 	p->name = game::getrandomname(specie, gender);

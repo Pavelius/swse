@@ -1,14 +1,9 @@
 #include "main.h"
 
-struct preability_i
-{
-	ability_s				key;
-	char					value;
-};
 struct prerequisit_i
 {
 	adat<feat_s, 8>			feats;
-	preability_i			abilities[2];
+	char					abilities[Charisma+1];
 	char					base_attack_bonus;
 };
 static struct feat_i
@@ -62,94 +57,94 @@ static struct feat_i
 	{{"Spontaneous Skill"}, Lineage, {{1, {Educated}}}},
 	{{"Wealth"}, Lineage},
 	//
-	{{"Acrobatic Strike"}, General},
-	{{"Armour Proficience Light"}, General},
-	{{"Armour Proficience Medium"}, General},
-	{{"Armour Proficience Heavy"}, General},
-	{{"Bantha Rush"}, General},
-	{{"Burst Fire"}, General},
-	{{"Careful Shoot"}, General},
-	{{"Charging Fire"}, General},
-	{{"Cleave"}, General},
-	{{"Combat Reflexes"}, General},
-	{{"Coordinated Attack"}, General},
-	{{"Crush"}, General},
-	{{"Cybernetic Surgery"}, General},
-	{{"Deadeye"}, General},
-	{{"Dodge"}, General},
-	{{"DoubleAttack"}, General},
-	{{"Dreadful Rage"}, General},
-	{{"DualWeapon Mastery"}, General},
-	{{"Extra Rage"}, General},
-	{{"Extra Second Wind"}, General},
-	{{"Far Shoot"}, General},
-	{{"Force Boon"}, General},
-	{{"Force Sensitivity"}, General},
-	{{"Force Training"}, General},
-	{{"Improved Charge"}, General},
-	{{"Improved Defences"}, General},
-	{{"Improved Disarm"}, General},
-	{{"Improved Damage Threshold"}, General},
-	{{"Linguist"}, General},
-	{{"Martial Arts"}, General},
-	{{"Martial Arts II"}, General},
-	{{"Martial Arts III"}, General},
-	{{"Melee Defence"}, General},
-	{{"Mighty Swing"}, General},
-	{{"Mobility"}, General},
-	{{"Pin"}, General},
-	{{"Point-blank Shoot"}, General},
-	{{"Power Attack"}, General},
-	{{"Powerful Charge"}, General},
-	{{"Precise Shoot"}, General},
-	{{"Quick Draw"}, General},
-	{{"Rapid Shoot"}, General},
-	{{"Rapid Strike"}, General},
-	{{"Running Attack"}, General},
-	{{"Shake it off"}, General},
-	{{"Sniper"}, General},
-	{{"Skill focus (Acrobatic)"}, General},
-	{{"Skill focus (Climb)"}, General},
-	{{"Skill focus (Deception)"}, General},
-	{{"Skill focus (Endurance)"}, General},
-	{{"Skill focus (Gather Information)"}, General},
-	{{"Skill focus (Initiative)"}, General},
-	{{"Skill focus (Jump)"}, General},
-	{{"Skill focus (Buerocracy)"}, General},
-	{{"Skill focus (Galactic Lore)"}, General},
-	{{"Skill focus (Life Sciences)"}, General},
-	{{"Skill focus (Physical Sciences)"}, General},
-	{{"Skill focus (Social Sciences)"}, General},
-	{{"Skill focus (Tactics)"}, General},
-	{{"Skill focus (Technology)"}, General},
-	{{"Skill focus (Mechanics)"}, General},
-	{{"Skill focus (Perception)"}, General},
-	{{"Skill focus (Persuasion)"}, General},
-	{{"Skill focus (Pilot)"}, General},
-	{{"Skill focus (Ride)"}, General},
-	{{"Skill focus (Stealth)"}, General},
-	{{"Skill focus (Survival)"}, General},
-	{{"Skill focus (Swim)"}, General},
-	{{"Skill focus (Treat Injury)"}, General},
-	{{"Skill focus (Use Computer)"}, General},
-	{{"Skill focus (Use Force)"}, General},
-	{{"Strong in the Force"}, General},
-	{{"Surgical Expertise"}, General},
-	{{"Throw"}, General},
-	{{"Toughness"}, General},
-	{{"Trip"}, General},
-	{{"Triple attack"}, General},
-	{{"Triple critical"}, General},
-	{{"Vehicular combat"}, General},
-	{{"Weapon finess"}, General},
-	{{"Weapon proficiency (Advanced Melee Weapons)"}, General},
-	{{"Weapon proficiency (Exotic Weapons)"}, General},
-	{{"Weapon proficiency (Heavy Weapons)"}, General},
-	{{"Weapon proficiency (Lightsabers)"}, General},
-	{{"Weapon proficiency (Pistols)"}, General},
-	{{"Weapon proficiency (Rifles)"}, General},
-	{{"Weapon proficiency (Simple Weapons)"}, General},
-	{{"Whirlwind attack"}, General},
+	{{"Acrobatic Strike", "Акроатический удар"}, General},
+	{{"Armour Proficience Light", "Ношение легкой брони"}, General},
+	{{"Armour Proficience Medium", "Ношение средней брони"}, General},
+	{{"Armour Proficience Heavy", "Ношение тяжелой брони"}, General},
+	{{"Bantha Rush", "Толчек"}, General},
+	{{"Burst Fire", "Стрельба короткими очередями"}, General},
+	{{"Careful Shoot", "Аккуратная стрельба"}, General},
+	{{"Charging Fire", "Стрельба при нападении"}, General},
+	{{"Cleave", "Рассечение"}, General},
+	{{"Combat Reflexes", "Боевые рефлексы"}, General},
+	{{"Coordinated Attack", "Скоординированная атака"}, General},
+	{{"Crush", "Удушение"}, General},
+	{{"Cybernetic Surgery", "Кибернетическое протезирование"}, General},
+	{{"Deadeye", "Мертвый глаз"}, General},
+	{{"Dodge", "Уклонение"}, General},
+	{{"Double Attack", "Двойная атака"}, General},
+	{{"Dreadful Rage", "Ужасное бешенство"}, General},
+	{{"Dual weapon Mastery", "Сражение двумя оружиями"}, General},
+	{{"Extra Rage", "Дополнительное бешенство"}, General},
+	{{"Extra Second Wind", "Дополнительное второе дыхание"}, General},
+	{{"Far Shoot", "Дальний выстрел"}, General},
+	{{"Force Boon", "Благосклонность Силы"}, General},
+	{{"Force Sensitivity", "Чувство Силы"}, General},
+	{{"Force Training", "Обучение Силе"}, General},
+	{{"Improved Charge", "Улучшенное нападение"}, General},
+	{{"Improved Defences", "Улучшенная защита"}, General},
+	{{"Improved Disarm", "Улучшенное обезоруживание"}, General},
+	{{"Improved Damage Threshold", "Улучшенная переносимость урона"}, General},
+	{{"Linguist", "Лингвист"}, General},
+	{{"Martial Arts", "Рукопашный бой"}, General},
+	{{"Martial Arts II", "Рукопашный бой II"}, General},
+	{{"Martial Arts III", "Рукопашный бой III"}, General},
+	{{"Melee Defence", "Защита в ближнем бою"}, General},
+	{{"Mighty Swing", "Мощный размах"}, General},
+	{{"Mobility", "Мобильность"}, General},
+	{{"Pin", "Захват"}, General},
+	{{"Point-blank Shoot", "Выстрел навскидку"}, General},
+	{{"Power Attack", "Мощная атака"}, General},
+	{{"Powerful Charge", "Мощное нападение"}, General},
+	{{"Precise Shoot", "Прицельный выстрел"}, General},
+	{{"Quick Draw", "БЫстрое выхватывание оружия"}, General},
+	{{"Rapid Shoot", "Скоростной выстрел"}, General},
+	{{"Rapid Strike", "Скоростной удар"}, General},
+	{{"Running Attack", "Атака на бегу"}, General},
+	{{"Shake it off", "Избавься от этого"}, General},
+	{{"Sniper", "Снайпер"}, General},
+	{{"Skill focus (Acrobatic)", "Фокус на акробатике"}, General},
+	{{"Skill focus (Climb)", "Фокус на лазание"}, General},
+	{{"Skill focus (Deception)", "Фокус на обмане"}, General},
+	{{"Skill focus (Endurance)", "Фокус на выносливости"}, General},
+	{{"Skill focus (Gather Information)", "Фокус на добывание информации"}, General},
+	{{"Skill focus (Initiative)", "Фокус на инициативе"}, General},
+	{{"Skill focus (Jump)", "Фокус на прыжках"}, General},
+	{{"Skill focus (Buerocracy)", "Фокус на бюрократии"}, General},
+	{{"Skill focus (Galactic Lore)", "Фокус на знаниях галактики"}, General},
+	{{"Skill focus (Life Sciences)", "Фокус на живых науках"}, General},
+	{{"Skill focus (Physical Sciences)", "Фокус на физических науках"}, General},
+	{{"Skill focus (Social Sciences)", "Фокус на социальных науках"}, General},
+	{{"Skill focus (Tactics)", "Фокус на тактике"}, General},
+	{{"Skill focus (Technology)", "Фокус на технологиях"}, General},
+	{{"Skill focus (Mechanics)", "Фокус на механике"}, General},
+	{{"Skill focus (Perception)", "Фокус на восприятии"}, General},
+	{{"Skill focus (Persuasion)", "Фокус на убеждении"}, General},
+	{{"Skill focus (Pilot)", "Фокус на пилотировании"}, General},
+	{{"Skill focus (Ride)", "Фокус на езде верхом"}, General},
+	{{"Skill focus (Stealth)", "Фокус на скрытности"}, General},
+	{{"Skill focus (Survival)", "Фокус на выживании"}, General},
+	{{"Skill focus (Swim)", "Фокус на плавании"}, General},
+	{{"Skill focus (Treat Injury)", "Фокус на оработке ранений"}, General},
+	{{"Skill focus (Use Computer)", "Фокус на использовании компьютера"}, General},
+	{{"Skill focus (Use Force)", "Фокус на использовании силы"}, General},
+	{{"Strong in the Force", "Способный в Силе"}, General},
+	{{"Surgical Expertise", "Хирургический эксперт"}, General},
+	{{"Throw", "Бросок"}, General},
+	{{"Toughness", "Живучесть"}, General},
+	{{"Trip", "Подсечка"}, General},
+	{{"Triple attack", "Тройная атака"}, General},
+	{{"Triple critical", "Тройной критический"}, General},
+	{{"Vehicular combat", "Бой на транспорте"}, General},
+	{{"Weapon finess", "Фехтование"}, General},
+	{{"Weapon proficiency (Advanced Melee Weapons)", "Владение улучшенным оружием ближнего боя"}, General},
+	{{"Weapon proficiency (Exotic Weapons)", "Владение экзотическим оружием"}, General},
+	{{"Weapon proficiency (Heavy Weapons)", "Владение тяжелым оружием"}, General},
+	{{"Weapon proficiency (Lightsabers)", "Владение световым мечем"}, General},
+	{{"Weapon proficiency (Pistols)", "Владение пистолетами"}, General},
+	{{"Weapon proficiency (Rifles)", "Владение винтовками"}, General},
+	{{"Weapon proficiency (Simple Weapons)", "Владение простым оружием"}, General},
+	{{"Whirlwind attack", "Атака вихрем"}, General},
 	//
 	{{"Acrobatic", "Акробатика"}, Skills},
 	{{"Climb", "Лазить"}, Skills},
@@ -206,3 +201,39 @@ static struct feat_i
 };
 assert_enum(feat, Scent);
 getstr_enum(feat);
+
+bool creature::isallow(feat_s id) const
+{
+	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
+	{
+		if(feat_data[id].require.abilities[i]
+			&& abilities[i] < feat_data[id].require.abilities[i])
+			return false;
+	}
+	for(auto e : feat_data[id].require.feats)
+	{
+		if(!is(e))
+			return false;
+	}
+	return true;
+}
+
+unsigned creature::select(feat_s* result, unsigned result_count, talent_s talent) const
+{
+	auto p = result;
+	auto pe = p + result_count;
+	for(auto i = FirstFeat; i <= LastFeat; i = (feat_s)(i + 1))
+	{
+		if(feat_data[i].tree != talent)
+			continue;
+		if(is(i))
+			continue;
+		if(!isallow(i))
+			continue;
+		if(p < pe)
+			*p++ = i;
+		else
+			break;
+	}
+	return p - result;
+}
