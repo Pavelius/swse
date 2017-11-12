@@ -103,7 +103,7 @@ void creature::chooseskill(bool interactive, int count)
 	}
 }
 
-char roll_4d6()
+static char roll_4d6()
 {
 	char temp[4];
 	for(auto& e : temp)
@@ -153,6 +153,9 @@ creature* creature::create(specie_s specie, gender_s gender, class_s cls, bool i
 	p->set(specie);
 	p->set(cls);
 	p->chooseskill(interactive, p->getskills());
+	if(p->getheroiclevel())
+		p->hits = game::getdice(cls) * 3;
+	p->name = game::getrandomname(specie, gender);
 	if(setplayer)
 		zcat(players, p);
 	return p;

@@ -1,42 +1,20 @@
 #include "main.h"
 
-static struct action_i
+static struct combat_action_i
 {
-	feat_s			feat;
-	wear_s			weapon;
+	combat_action_s	action;
 	const char*		text;
-	bool			(creature::*t0)() const;
-	bool			(creature::*t1)(const creature*) const;
-	bool			(creature::*t2)(const creature*) const;
-
-	bool match(const creature* player, const creature* opponent) const
-	{
-		if(t1 && !(player->*t1)(opponent))
-			return false;
-		if(t2 && !(player->*t2)(opponent))
-			return false;
-		return true;
-	}
-
-	bool match(const creature* player, creaturea& combatants) const
-	{
-		for(auto p : combatants)
-		{
-			if(!p->isactive())
-				continue;
-			if(match(player, p))
-				return true;
-		}
-		return false;
-	}
-
-} action_data[] = {
-	{BurstFire, RangedWeapon, "Дать короткую очередь в одну цель", 0, &creature::isenemy},
-	{BanthaRush, MeleeWeapon, "С криком броситься на врага в рукопашную"},
-	{AcrobaticStrike, MeleeWeapon, "Сделать пирует и атаковать врага"},
-	{ChargingFire, RangedWeapon, "С криком броситься на врага, стреляя в него на бегу"},
-	{NoFeat, MeleeWeapon, "Нанести удар противнику"},
-	{NoFeat, RangedWeapon, "Стрельнуть по противнику"}
+	bool			(creature::*self)() const;
+	bool			(creature::*opponent)(const creature* e) const;
+} combat_action_data[] = {
+	{Attack, "Нанести удар противнику", &creature::ismelee, &creature::isreachenemy},
+	{Attack, "Стрелять по противнику", &creature::isrange, &creature::isenemy},
+	{FightDefensively, "Нанести удар противнику из защитной стойки", &creature::ismelee, &creature::isreachenemy},
+	{Charge, "С криками броситься на врага", 0, &creature::isenemy},
+	{Disarm, "Попытаться обезоружить врага", 0, &creature::isreachenemy},
+	{Grab, "Схватить оппонента", 0, &creature::isreachenemy},
+	{Move, "Двигаться в сторону врага", 0},
+	{DrawWeapon, "Сменить оружие", &creature::isgearweapon},
 };
 
 static int compare_initiative(const void* p1, const void* p2)
@@ -60,32 +38,79 @@ static bool iscombat(creaturea& source)
 	return false;
 }
 
-static creature* getmelee(creaturea& enemies)
+static unsigned select(creature** result, unsigned count, const creature* player, creaturea& combatants, bool (creature::*proc)(const creature* p) const)
 {
-	return enemies.data[0];
+	auto pa = result;
+	auto pb = pa + count;
+	for(auto p : combatants)
+	{
+		if(!p->isactive())
+			continue;
+		if(!(player->*proc)(p))
+			continue;
+		if(pa < pb)
+			*pa++ = p;
+		else
+			break;
+	}
+	return pa - result;
 }
 
-static bool test(creature* player, creaturea& enemies, creature::testing t1)
+static bool match(creature* player, creaturea& combatants, bool (creature::*proc)(const creature* p) const)
 {
-	for(auto p : enemies)
-	{
-		if(t1 && !(player->*t1)(p))
-			continue;
-	}
-	return false;
+	creature* result[1];
+	return select(result, lenghtof(result), player, combatants, proc)!=0;
 }
 
-void creature::combatactions(creaturea& enemies, bool interactive)
+static creature* choose(creature* player, creaturea& combatants, bool (creature::*proc)(const creature* p) const, bool intaractive)
 {
-	for(unsigned i=0; i<lenghtof(action_data); i++)
+	creaturea result;
+	result.count = select(result.data, lenghtof(result.data), player, combatants, proc);
+	if(!result.count)
+		return 0;
+	else if(result.count == 1)
+		return result.data[0];
+	for(unsigned i = 0; i < result.count; i++)
+		logs::add(i, result.data[i]->getname());
+	return result.data[logs::input(intaractive, false, "Кто будет целью?")];
+}
+
+void creature::combatactions(creaturea& combatants, bool interactive)
+{
+	while(is(StandartAction))
 	{
-		if(action_data[i].feat && !is(action_data[i].feat))
-			continue;
-		if(!action_data[i].match(this, enemies))
-			continue;
-		logs::add(i, action_data[i].text);
+		for(auto i = 0; i < lenghtof(combat_action_data); i++)
+		{
+			auto& a = combat_action_data[i];
+			auto action = getaction(a.action);
+			if(!isallow(action))
+				continue;
+			if(a.self && !(this->*a.self)())
+				continue;
+			if(a.opponent && !match(this, combatants, a.opponent))
+				continue;
+			logs::add(i, a.text);
+		}
+		if(!logs::getcount())
+			return;
+		auto& a = combat_action_data[logs::input(interactive, false, "\nЧто будет делать [%1]?", getname())];
+		creature* opponent = 0;
+		if(a.opponent)
+			opponent = choose(this, combatants, a.opponent, interactive);
+		if(interactive)
+			logs::add("\n");
+		auto action = getaction(a.action);
+		use(action);
+		switch(a.action)
+		{
+		case Attack:
+			attack(opponent, interactive);
+			break;
+		case StandUp:
+			set(StandAndReady);
+			break;
+		}
 	}
-	auto id = logs::input(interactive, false, "Что будет делать [%1]?", getname());
 }
 
 void game::combat(bool interactive)
@@ -113,12 +138,10 @@ void game::combat(bool interactive)
 		{
 			if(!p->isactive())
 				continue;
-			creaturea enemies;
-			p->getenemies(enemies, source);
-			if(!enemies)
-				continue;
-			p->combatactions(enemies, interactive);
+			p->setready();
+			p->combatactions(source, interactive);
 		}
 	}
+	logs::next();
 }
 

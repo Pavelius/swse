@@ -121,3 +121,33 @@ const dice& item::getdice() const
 {
 	return item_data[type].weapon_stats.damage;
 }
+
+bool item::ismelee() const
+{
+	return type <= GlovesMedium;
+}
+
+bool item::isweapon() const
+{
+	if(type == NoItem)
+		return false;
+	return type <= Net;
+}
+
+void item::clear()
+{
+	type = NoItem;
+	count = 0;
+}
+
+void item::setcount(int count)
+{
+	if(!count)
+		clear();
+	else
+	{
+		if(count > 256)
+			count = 256;
+		this->count = count - 1;
+	}
+}

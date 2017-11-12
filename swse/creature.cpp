@@ -8,15 +8,31 @@ bool creature::is(feat_s id) const
 	return (feats[id / 8] & (1 << (id % 8))) != 0;
 }
 
+bool creature::is(action_s id) const
+{
+	return (actions & (1 << id)) == 0;
+}
+
 void creature::set(feat_s id, bool interactive)
 {
 	feats[id / 8] |= (1 << (id % 8));
-//	feats[id / 8] &= ~(1 << (id % 8));
+	//	feats[id / 8] &= ~(1 << (id % 8));
 }
 
 void creature::remove(feat_s id)
 {
 	feats[id / 8] &= ~(1 << (id % 8));
+}
+
+void creature::set(action_s id)
+{
+	actions |= (1 << id);
+}
+
+void creature::setready()
+{
+	actions = 0;
+	reflex_bonus = 0;
 }
 
 int creature::getbonus(ability_s id) const
@@ -40,15 +56,19 @@ int	creature::get(feat_s id) const
 
 int	creature::get(defence_s id) const
 {
+	static char reflex_size_bonus[] = {10, 5, 2, 1, 0, -1, -2, -5, -10};
+	static_assert(lenghtof(reflex_size_bonus) == SizeCollosal + 1, "Invalid count of size elements");
 	auto result = 10;
 	switch(id)
 	{
 	case Reflexes:
-		if(wears[Armor])
-			result += wears[Armor].getreflexes();
+		if(armor)
+			result += armor.getreflexes();
 		else
 			result += getheroiclevel();
+		result += reflex_bonus;
 		result += getbonus(Dexterity);
+		result += reflex_size_bonus[getsize()];
 		break;
 	case Fortitude:
 		result += getheroiclevel();
@@ -85,6 +105,8 @@ int	creature::roll(int bonus, int dc, bool interactive, int* dice_rolled) const
 
 void creature::damage(int count, bool interactive)
 {
+	if(count < 0)
+		count = 1;
 	if(count < hits)
 	{
 		hits -= count;
@@ -99,18 +121,17 @@ void creature::damage(int count, bool interactive)
 	}
 }
 
-void creature::attack(wear_s id, creature* enemy, bool interactive)
+void creature::attack(creature* enemy, bool interactive, int bonus)
 {
-	attackinfo e;
-	if(!getattackinfo(id, e))
-		return;
+	attackinfo e; getattackinfo(e);
+	e.bonus += bonus;
 	int dice_rolled;
 	int defence = enemy->get(Reflexes);
-	int rolled = roll(e.bonus, 0, interactive, &dice_rolled);
-	if(rolled >= defence || rolled >= e.critical_range)
+	int rolled = roll(e.bonus, defence, interactive, &dice_rolled);
+	if(rolled >= 0 || dice_rolled >= e.critical_range)
 	{
 		auto damage_count = e.damage.roll();
-		if(rolled >= e.critical_range)
+		if(dice_rolled >= e.critical_range)
 		{
 			if(interactive)
 				logs::add("%1 критически попал%2.", getname(), getA());
@@ -150,26 +171,31 @@ bool creature::isactive() const
 	return hits >= 0;
 }
 
-bool creature::getattackinfo(wear_s id, attackinfo& e) const
+void creature::getattackinfo(attackinfo& e) const
 {
+	static unsigned char unarmed_dice[] = {1, 1, 2, 3, 4, 6, 8, 10, 12, 20};
 	memset(&e, 0, sizeof(e));
 	e.critical_range = 20;
 	e.critical_multiply = 2;
-	if(wears[id])
-		e.damage = wears[id].getdice();
+	if(weapon)
+		e.damage = weapon.getdice();
+	else
+	{
+		int d = getsize();
+		if(is(MartialArts))
+			d++;
+		e.damage.c = 1;
+		e.damage.d = unarmed_dice[d];
+	}
 	e.bonus = getbaseattack();
 	e.damage.b += getheroiclevel() / 2;
-	switch(id)
+	if(weapon.ismelee())
 	{
-	case MeleeWeapon:
 		e.bonus += getbonus(Strenght);
 		e.damage.b += getbonus(Strenght);
-		break;
-	case RangedWeapon:
-		e.bonus += getbonus(Dexterity);
-		break;
 	}
-	return true;
+	else
+		e.bonus += getbonus(Dexterity);
 }
 
 void creature::getenemies(creaturea& result, const creaturea& source) const
@@ -197,5 +223,110 @@ void creature::rollinitiative()
 
 bool creature::isenemy(const creature* e) const
 {
-	return getside() == e->getside();
+	return getside() != e->getside();
+}
+
+bool creature::isreachenemy(const creature* e) const
+{
+	if(!isenemy(e))
+		return false;
+	return iabs(position - e->position) <= getreach();
+}
+
+bool creature::isallow(action_s id) const
+{
+	switch(id)
+	{
+	case SwiftAction:
+		return is(StandartAction) || is(MoveAction) || is(SwiftAction);
+	case MoveAction:
+		return is(StandartAction) || is(MoveAction);
+	case FullRoundAction:
+		return is(StandartAction) && is(MoveAction) && is(SwiftAction);
+	default:
+		return is(id);
+	}
+}
+
+action_s creature::getaction(combat_action_s id) const
+{
+	switch(id)
+	{
+	case Move:
+		return MoveAction;
+	case DrawWeapon:
+		if(is(QuickDraw))
+			return SwiftAction;
+		return MoveAction;
+	default:
+		return StandartAction;
+	}
+}
+
+void creature::use(action_s id)
+{
+	switch(id)
+	{
+	case FullRoundAction:
+		set(StandartAction);
+		set(SwiftAction);
+		set(MoveAction);
+		break;
+	case MoveAction:
+		if(is(MoveAction))
+			set(MoveAction);
+		else
+			set(StandartAction);
+		break;
+	case SwiftAction:
+		if(is(SwiftAction))
+			set(SwiftAction);
+		else if(is(MoveAction))
+			set(MoveAction);
+		else
+			set(StandartAction);
+		break;
+	case StandartAction:
+		set(StandartAction);
+		break;
+	case Reaction:
+		set(Reaction);
+		break;
+	}
+}
+
+void creature::set(state_s id, bool interactive)
+{
+	if(this->state == LayingDown && id == StandAndReady)
+	{
+		this->state = StandAndReady;
+		if(is(Acrobatic))
+		{
+			if(roll(Acrobatic, 15, interactive) >= 0)
+			{
+				if(interactive)
+					logs::add("%1 резко вскочил%а на ноги.", getname(), getA());
+				use(SwiftAction);
+				return;
+			}
+		}
+		if(interactive)
+			logs::add("%1 поднял%ась на ноги.", getname(), getAS());
+		use(MoveAction);
+	}
+}
+
+bool creature::isgearweapon() const
+{
+	for(auto e : gears)
+	{
+		if(e.isweapon())
+			return true;
+	}
+	return false;
+}
+
+const char*	creature::getname() const
+{
+	return game::getname(name);
 }

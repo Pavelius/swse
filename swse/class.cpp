@@ -34,7 +34,12 @@ int game::getskillpoints(class_s id)
 	return class_data[id].skills;
 }
 
-feata& getfeats(class_s id)
+feata& game::getfeats(class_s id)
 {
 	return class_data[id].starting_feats;
+}
+
+int game::getdice(class_s id)
+{
+	return class_data[id].dice;
 }

@@ -82,22 +82,22 @@ void logs::addv(const char* format, const char* param)
 {
 	if(!format)
 		return;
-	char* p = getptr();
+	auto p = getptr();
 	// First string may not be emphty or white spaced
 	if(p == content)
 		format = zskipspcr(format);
-	if(format[0] == 0)
-		return;
-	if(p != content)
+	else
 	{
 		if(p[-1] != ' ' && p[-1] != '\n' && *format != '\n' && *format != '.' && *format != ',')
 		{
 			*p++ = ' ';
 			*p = 0;
 		}
-		if(p[-1] == '\n' && format[0] == '\n')
+		while(p[-1] == '\n' && format[0] == '\n')
 			format++;
 	}
+	if(format[0] == 0)
+		return;
 	szprintv(p, format, param);
 }
 

@@ -12,6 +12,11 @@
 #define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
 #define lenghtof(t) (sizeof(t)/sizeof(t[0]))
 
+enum size_s : char {
+	SizeFine, SizeDiminutive, SizeTiny,
+	SizeSmall, SizeMeduim, SizeLarge,
+	SizeHuge, SizeGargantuan, SizeCollosal
+};
 enum ability_s : char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma
 };
@@ -51,7 +56,8 @@ enum feat_s : unsigned short {
 	ExtraRage, ExtraSecondWind,
 	FarShoot, ForceBoon, ForceSensitivity, ForceTraining,
 	ImprovedCharge, ImprovedDefences, ImprovedDisarm, ImprovedDamageThreshold, Linguist,
-	MartialArts, MeleeDefence, MightySwing,
+	MartialArts, MartialArtsII, MartialArtsIII,
+	MeleeDefence, MightySwing,
 	Mobility, Pin, PointBlankShoot, PowerAttack, PowerfulCharge,
 	PreciseShoot, QuickDraw, RapidShoot, RapidStrike, RunningAttack,
 	ShakeItOff,
@@ -76,6 +82,7 @@ enum feat_s : unsigned short {
 	Survival, Swim, TreatInjury, UseComputer, UseForce,
 	FirstSkill = Acrobatic, LastSkill = UseForce,
 	// Races feats
+	BonusSkill, BonusFeat,
 	Primitive, LowlightVision, Darkvision,
 	ExpertSwimmer, ExpertPilot, ExpertClimber, Sneaky, SurvivalInstinct, IntuitiveInitiative, KeenForceSence, HeightenAwareness, Deceptive, ExtraordinaryRecuperation,
 	HoldBreath, BreathUnderwater, Bellow, LimbRegeneration, NaturalArmour,
@@ -111,20 +118,35 @@ enum item_s : unsigned char {
 	Electrobinocular, GlowRod, FusionLatern, AudioRecorder, HoloRecorder, VideoRecorder, SensorPack,
 	Comlink, PocketScrambler, VoxBox,
 };
-enum wear_s : unsigned char {
-	MeleeWeapon, RangedWeapon, ThrownWeapon, Armor, Equipment,
-};
 enum side_s : unsigned char {
 	PartySide, EnemySide,
+};
+enum action_s : unsigned char {
+	StandartAction, MoveAction, SwiftAction, Reaction, FreeAction, FullRoundAction,
+};
+enum state_s : unsigned char {
+	StandAndReady, LayingDown,
+};
+enum combat_action_s : unsigned char {
+	Attack, Aid, Charge, Disarm, FightDefensively, Grab,
+	Move, DrawWeapon, ManiplateItem, StandUp, Withdraw,
+	UseItem, Aim, CatchSecondWind, DropItem, FallProne, Recover,
+	CoupDeGrace, FullAttack, Run,
 };
 typedef adat<feat_s, 8>				feata;
 typedef adat<struct creature*, 64>	creaturea;
 struct item
 {
 	item_s					type;
+	unsigned char			count;
 	operator bool() const { return type != NoItem; }
+	void					clear();
+	int						getcount() const;
 	int						getreflexes() const;
 	const dice&				getdice() const;
+	void					setcount(int count = 1);
+	bool					ismelee() const;
+	bool					isweapon() const;
 };
 struct location
 {
@@ -158,10 +180,11 @@ struct attackinfo
 struct creature
 {
 	typedef bool(creature::*testing)(const creature*) const;
-	item					wears[Armor + 1];
+	item					weapon, armor;
 	item					gears[8];
+	state_s					state;
 	operator bool() const { return specie != NoSpecies; }
-	void					attack(wear_s id, creature* enemy, bool interactive);
+	void					attack(creature* enemy, bool interactive, int bonus = 0);
 	void					combatactions(creaturea& enemies, bool interactive);
 	static creature*		create(bool interactive = false, bool setplayer = false);
 	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
@@ -170,18 +193,29 @@ struct creature
 	int						get(class_s id) const { return classes[id]; }
 	int						get(defence_s id) const;
 	const char*				getA() const { return gender == Female ? "а" : ""; }
-	bool					getattackinfo(wear_s id, attackinfo& e) const;
+	const char*				getAS() const { return gender == Female ? "ась" : "с€"; }
+	action_s				getaction(combat_action_s id) const;
+	void					getattackinfo(attackinfo& e) const;
 	int						getbaseattack() const;
 	int						getbonus(ability_s id) const;
 	void					getenemies(creaturea& result, const creaturea& source) const;
 	int						getheroiclevel() const;
-	const char*				getname() const { return "ѕитер"; }
+	const char*				getname() const;
 	int						getinitiative() const { return initiative; }
+	int						getreach() const { return 1; }
 	side_s					getside() const { return side; }
+	size_s					getsize() const { return SizeMeduim; }
+	int						getspeed() const { return 6; }
 	bool					is(feat_s id) const;
+	bool					is(action_s id) const;
 	bool					isactive() const;
+	bool					isallow(action_s id) const;
 	bool					isclass(feat_s id) const;
 	bool					isenemy(const creature* e) const;
+	bool					ismelee() const { return weapon.ismelee(); }
+	bool					isrange() const { return !weapon.ismelee(); }
+	bool					isreachenemy(const creature* e) const;
+	bool					isgearweapon() const;
 	void					remove(feat_s id);
 	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
@@ -191,16 +225,23 @@ struct creature
 	void					set(gender_s id);
 	void					set(specie_s id);
 	void					set(side_s id);
+	void					set(action_s id);
+	void					set(state_s id, bool interactive = true);
+	void					setready();
+	void					use(action_s id);
 private:
 	char					abilities[6];
 	char					classes[Beast + 1];
 	unsigned char			feats[LastFeat / 8 + 1];
+	short unsigned			name;
 	gender_s				gender;
 	specie_s				specie;
 	short					hits;
 	char					initiative;
 	short					position;
 	side_s					side;
+	unsigned char			actions;
+	char					reflex_bonus;
 	//
 	void					chooseabilities(bool interactive);
 	static class_s			chooseclass(bool interactive);
@@ -213,8 +254,11 @@ namespace game
 {
 	void					combat(bool interactive);
 	ability_s 				getability(feat_s id);
+	int						getdice(class_s id);
+	feata&					getfeats(class_s id);
+	const char*				getname(short unsigned id);
+	short unsigned			getrandomname(specie_s race, gender_s gender);
 	int						getskillpoints(class_s id);
 }
 extern adat<creature, 512>	creatures;
 extern creature*			players[6];
-feata&						getfeats(class_s id);
