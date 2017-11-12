@@ -6,7 +6,7 @@ int	main(int argc, char *argv[])
 	auto p2 = getstr(DoubleAttack);
 	logs::open("SW");
 	location test;
-	creature::create(true, true);
+	creature::create(Human, Male, Jedi, true, true);
 	//game::combat(true);
 	test.create();
 	test.acting();
