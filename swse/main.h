@@ -84,8 +84,8 @@ enum feat_s : unsigned short {
 	// Races feats
 	BonusSkill, BonusFeat,
 	Primitive, LowlightVision, Darkvision,
-	ExpertSwimmer, ExpertPilot, ExpertClimber, Sneaky, SurvivalInstinct, IntuitiveInitiative, KeenForceSence, HeightenAwareness, Deceptive, ExtraordinaryRecuperation,
-	HoldBreath, BreathUnderwater, Bellow, LimbRegeneration, NaturalArmour,
+	ExpertSwimmer, ExpertPilot, ExpertClimber, Sneaky, SurvivalInstinct, IntuitiveInitiative, KeenForceSence, HeightenAwareness, Deceptive,
+	ExtraordinaryRecuperation, HoldBreath, BreathUnderwater, Bellow, LimbRegeneration, NaturalArmor,
 	IronWill, GreatFortitude, LightingReflexes, SuperiorDefences,
 	Rage, Scent,
 	FirstFeat = AdeptNegotiator, LastFeat = Scent,

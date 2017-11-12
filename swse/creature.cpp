@@ -66,6 +66,8 @@ int	creature::get(defence_s id) const
 			result += armor.getreflexes();
 		else
 			result += getheroiclevel();
+		if(is(NaturalArmor))
+			result += 1;
 		result += reflex_bonus;
 		result += getbonus(Dexterity);
 		result += reflex_size_bonus[getsize()];
@@ -79,6 +81,8 @@ int	creature::get(defence_s id) const
 		result += getbonus(Wisdow);
 		break;
 	}
+	if(is(SuperiorDefences))
+		result++;
 	return result;
 }
 
