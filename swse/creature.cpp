@@ -3,6 +3,11 @@
 adat<creature, 512>	creatures;
 creature*			players[6];
 
+void creature::clear()
+{
+	memset(this, 0, sizeof(*this));
+}
+
 bool creature::is(feat_s id) const
 {
 	return (feats[id / 8] & (1 << (id % 8))) != 0;
@@ -16,7 +21,6 @@ bool creature::is(action_s id) const
 void creature::set(feat_s id, bool interactive)
 {
 	feats[id / 8] |= (1 << (id % 8));
-	//	feats[id / 8] &= ~(1 << (id % 8));
 }
 
 void creature::remove(feat_s id)
@@ -332,6 +336,8 @@ bool creature::isgearweapon() const
 
 const char*	creature::getname() const
 {
+	if(pregen)
+		return getstr(pregen);
 	return game::getname(name);
 }
 

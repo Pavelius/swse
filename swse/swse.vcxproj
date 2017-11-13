@@ -22,13 +22,13 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{2A42C96E-79DA-4870-8F48-34AC74386019}</ProjectGuid>
     <RootNamespace>swse</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -159,6 +159,7 @@
     <ClCompile Include="names.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="pregen.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="location.cpp" />
     <ClCompile Include="skill.cpp" />

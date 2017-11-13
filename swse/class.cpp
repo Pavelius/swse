@@ -12,10 +12,10 @@ static struct class_i
 	{{"Scoundrel", "Негодяй"}, 6, 4, {3, {PointBlankShoot, WeaponProficiencyPistols, WeaponProficiencySimpleWeapons}}},
 	{{"Scout", "Скаут"}, 8, 5, {4, {ShakeItOff, WeaponProficiencyPistols, WeaponProficiencyRifles, WeaponProficiencySimpleWeapons}}},
 	{{"Soldier", "Солдат"}, 10, 3, {5, {ArmourProficienceLight, ArmourProficienceMedium, WeaponProficiencyPistols, WeaponProficiencyRifles, WeaponProficiencySimpleWeapons}}},
-	{{"Non-Hero", "Не герой"}, 6},
 	{{"Beast", "Бестия"}, 10},
+	{{"Non-Hero", "Не герой"}, 6},
 };
-assert_enum(class, Beast);
+assert_enum(class, NonHero);
 getstr_enum(class);
 
 void creature::set(class_s id, bool interactive)

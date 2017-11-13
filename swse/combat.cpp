@@ -124,9 +124,10 @@ void game::combat(bool interactive)
 		p->set(PartySide);
 		source.add(p);
 	}
-	auto p = creature::create(false, false);
-	p->set(EnemySide);
-	source.add(p);
+	creature c1(Stormtrooper);
+	creature c2(Stormtrooper);
+	c1.set(EnemySide); source.add(&c1);
+	c2.set(EnemySide); source.add(&c2);
 	// 2 - roll initiative
 	for(auto p : source)
 		p->rollinitiative();

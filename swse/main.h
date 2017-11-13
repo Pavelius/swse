@@ -21,7 +21,7 @@ enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma
 };
 enum class_s : unsigned char {
-	Jedi, Noble, Scoundrel, Scout, Soldier, NonHero, Beast,
+	Jedi, Noble, Scoundrel, Scout, Soldier, Beast, NonHero,
 };
 enum specie_s : unsigned char {
 	NoSpecies,
@@ -73,6 +73,9 @@ enum feat_s : unsigned short {
 	WeaponProficiencyAdvancedMeleeWeapons, WeaponProficiencyExoticWeapons,
 	WeaponProficiencyHeavyWeapons, WeaponProficiencyLightsabers, WeaponProficiencyPistols,
 	WeaponProficiencyRifles, WeaponProficiencySimpleWeapons,
+	WeaponFocusAdvancedMeleeWeapons, WeaponFocusExoticWeapons,
+	WeaponFocusHeavyWeapons, WeaponFocusLightsabers, WeaponFocusPistols,
+	WeaponFocusRifles, WeaponFocusSimpleWeapons,
 	WhirlwindAttack,
 	// Skills
 	Acrobatic, Climb, Deception, Endurance, GatherInformation,
@@ -133,6 +136,10 @@ enum combat_action_s : unsigned char {
 	UseItem, Aim, CatchSecondWind, DropItem, FallProne, Recover,
 	CoupDeGrace, FullAttack, Run,
 };
+enum pregen_s : unsigned char {
+	NoPregen,
+	Stormtrooper, StromtrooperHeavy,
+};
 typedef adat<feat_s, 8>				feata;
 typedef adat<struct creature*, 64>	creaturea;
 struct item
@@ -179,14 +186,18 @@ struct attackinfo
 };
 struct creature
 {
-	typedef bool(creature::*testing)(const creature*) const;
-	item					weapon, armor;
-	item					gears[8];
+	item					weapon, armor, gears[8];
 	state_s					state;
+	//
+	creature(){}
+	creature(pregen_s pregen) { create(pregen); }
 	operator bool() const { return specie != NoSpecies; }
+	//
 	void					attack(creature* enemy, bool interactive, int bonus = 0);
+	void					clear();
 	void					combatactions(creaturea& enemies, bool interactive);
 	static creature*		create(bool interactive = false, bool setplayer = false);
+	void					create(pregen_s value);
 	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	void					damage(int count, bool interactive);
 	int						get(feat_s id) const;
@@ -234,11 +245,12 @@ struct creature
 	void					use(action_s id);
 private:
 	char					abilities[6];
-	char					classes[Beast + 1];
+	char					classes[NonHero + 1];
 	unsigned char			feats[LastFeat / 8 + 1];
 	short unsigned			name;
 	gender_s				gender;
 	specie_s				specie;
+	pregen_s				pregen;
 	short					hits;
 	char					initiative;
 	short					position;

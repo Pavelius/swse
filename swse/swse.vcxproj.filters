@@ -170,5 +170,8 @@
     <ClCompile Include="names.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="pregen.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
