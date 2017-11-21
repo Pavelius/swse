@@ -278,5 +278,15 @@ namespace game
 	short unsigned			getrandomname(specie_s race, gender_s gender);
 	int						getskillpoints(class_s id);
 }
+namespace logs
+{
+	struct state
+	{
+		const char*			information;
+		state();
+		~state();
+	};
+}
 extern adat<creature, 512>	creatures;
+extern logs::state			logc;
 extern creature*			players[6];
